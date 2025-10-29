@@ -18,8 +18,13 @@ export class User {
   @Prop()
   address: string;
 
-  @Prop({ default: 'user' })
-  role: 'user' | 'admin';
+  // Mise à jour du champ role avec les nouveaux rôles
+  @Prop({ default: 'etudiant', enum: ['admin', 'etudiant', 'surveillant', 'comptabilite'] })
+  role: 'admin' | 'etudiant' | 'surveillant' | 'comptabilite';
+
+  // Nouveau champ status
+  @Prop({ default: 'actif', enum: ['actif', 'inactif', 'bloque'] })
+  status: 'actif' | 'inactif' | 'bloque';
 
   @Prop({ default: false })
   isEmailVerified: boolean;

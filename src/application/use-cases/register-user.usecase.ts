@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, BadRequestException } from '@nestjs/common';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UserRepository } from '../../infrastructure/repositories/user.repository';
 import { MailerService } from '../../infrastructure/mailer/mailer.service';
@@ -13,7 +13,7 @@ export class RegisterUserUseCase {
 
   async execute(dto: CreateUserDto) {
     if (dto.password !== dto.confirmPassword) {
-      throw new InternalServerErrorException('Les mots de passe ne correspondent pas');
+      throw new BadRequestException('Les mots de passe ne correspondent pas');
     }
 
     const hashedPassword = await bcrypt.hash(dto.password, 10);
@@ -27,7 +27,8 @@ export class RegisterUserUseCase {
       otpExpiresAt,
       isEmailVerified: false,
       isApprovedByAdmin: false,
-      role: 'user',
+      role: dto.role ?? 'etudiant', // rôle par défaut si non fourni
+      status: dto.status ?? 'actif', // statut par défaut si non fourni
     });
 
     try {

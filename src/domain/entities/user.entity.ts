@@ -5,7 +5,9 @@ export class UserEntity {
   email: string;
   password: string;
   address: string;
-  role: 'user' | 'admin';
+  role: 'admin' | 'etudiant' | 'surveillant' | 'comptabilite';
+  status: 'actif' | 'inactif' | 'bloque';
+
   isEmailVerified: boolean;
   isApprovedByAdmin: boolean;
   otpCode?: string;

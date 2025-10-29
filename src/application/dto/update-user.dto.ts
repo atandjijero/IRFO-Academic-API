@@ -2,28 +2,37 @@ import { IsOptional, IsIn, IsString, IsEmail } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class UpdateUserDto {
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: "Prénom de l'utilisateur",
+    example: 'Jerome',
+  })
   @IsOptional()
   @IsString()
   firstName?: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: "Nom de famille de l'utilisateur",
+    example: 'Kouassi',
+  })
   @IsOptional()
   @IsString()
   lastName?: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: "Rôle de l'utilisateur",
+    enum: ['admin', 'etudiant', 'surveillant', 'comptabilite'],
+    example: 'etudiant',
+  })
   @IsOptional()
-  @IsEmail()
-  email?: string;
+  @IsIn(['admin', 'etudiant', 'surveillant', 'comptabilite'])
+  role?: 'admin' | 'etudiant' | 'surveillant' | 'comptabilite';
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: "Statut du compte utilisateur",
+    enum: ['actif', 'inactif', 'bloque'],
+    example: 'actif',
+  })
   @IsOptional()
-  @IsString()
-  address?: string;
-
-  @ApiPropertyOptional({ enum: ['user', 'admin'] })
-  @IsOptional()
-  @IsIn(['user', 'admin'])
-  role?: 'user' | 'admin'; // ✅ Type corrigé ici
+  @IsIn(['actif', 'inactif', 'bloque'])
+  status?: 'actif' | 'inactif' | 'bloque';
 }

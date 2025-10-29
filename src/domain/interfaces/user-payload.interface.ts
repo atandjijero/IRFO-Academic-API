@@ -1,7 +1,8 @@
 export interface UserPayload {
   id: string;
   email: string;
-  role: string;
-  iat?: number;
-  exp?: number;
+  role: 'admin' | 'etudiant' | 'surveillant' | 'comptabilite';
+  status?: 'actif' | 'inactif' | 'bloque';
+  iat?: number; 
+  exp?: number; 
 }

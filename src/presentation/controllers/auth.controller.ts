@@ -24,7 +24,7 @@ export class AuthController {
   constructor(
     private readonly registerUseCase: RegisterUserUseCase,
     private readonly userRepo: UserRepository,
-    private readonly jwtService: JwtTokenService
+    private readonly jwtService: JwtTokenService,
   ) {}
 
   @Post('register')
@@ -50,35 +50,44 @@ export class AuthController {
   }
 
   @Post('login')
-  @ApiOperation({ summary: 'Connexion de l’utilisateur' })
-  @ApiBody({ type: LoginDto })
-  @ApiResponse({ status: 200, description: 'Connexion réussie. Token JWT retourné.' })
-  @ApiResponse({ status: 400, description: 'Identifiants invalides ou compte non vérifié.' })
-  async login(@Body() body: LoginDto) {
-    const user = await this.userRepo.findByEmail(body.email);
-    if (!user) {
-      throw new BadRequestException('Utilisateur introuvable');
-    }
-
-    const isPasswordValid = await bcrypt.compare(body.password, user.password);
-    if (!isPasswordValid) {
-      throw new BadRequestException('Mot de passe incorrect');
-    }
-
-    if (!user.isEmailVerified) {
-      throw new BadRequestException('Email non vérifié');
-    }
-
-    if (!user.isApprovedByAdmin) {
-      throw new BadRequestException('Compte non approuvé par l’admin');
-    }
-
-    const token = this.jwtService.generateToken({
-      id: user._id.toString(),
-      email: user.email,
-      role: user.role,
-    });
-
-    return { token };
+@ApiOperation({ summary: 'Connexion de l’utilisateur' })
+@ApiBody({ type: LoginDto })
+@ApiResponse({ status: 200, description: 'Connexion réussie. Token JWT retourné.' })
+@ApiResponse({ status: 400, description: 'Identifiants invalides ou compte non vérifié.' })
+async login(@Body() body: LoginDto) {
+  const user = await this.userRepo.findByEmail(body.email);
+  if (!user) {
+    throw new BadRequestException('Utilisateur introuvable');
   }
+
+  const isPasswordValid = await bcrypt.compare(body.password, user.password);
+  if (!isPasswordValid) {
+    throw new BadRequestException('Mot de passe incorrect');
+  }
+
+  if (!user.isEmailVerified) {
+    throw new BadRequestException('Email non vérifié');
+  }
+
+  if (!user.isApprovedByAdmin) {
+    throw new BadRequestException('Compte non approuvé par l’admin');
+  }
+
+  if (user.status === 'bloque') {
+    throw new BadRequestException('Compte bloqué par l’administration');
+  }
+
+  if (user.status === 'inactif') {
+    throw new BadRequestException('Compte inactif. Veuillez contacter l’administration.');
+  }
+
+  const token = this.jwtService.generateToken({
+    id: user._id.toString(),
+    email: user.email,
+    role: user.role,
+    status: user.status,
+  });
+
+  return { token };
+}
 }

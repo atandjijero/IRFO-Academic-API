@@ -15,7 +15,13 @@ import { RolesGuard } from '../guards/roles.guard';
 import { Roles } from '../decorators/roles.decorator';
 import { AuthGuard } from '../guards/auth.guard';
 import { UpdateUserDto } from 'src/application/dto/update-user.dto';
-import { ApiBearerAuth, ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiParam,
+} from '@nestjs/swagger';
 
 @ApiTags('Users')
 @ApiBearerAuth('access-token')
@@ -27,6 +33,7 @@ export class UserController {
   @Roles('admin')
   @Get()
   @ApiOperation({ summary: 'Voir tous les utilisateurs (admin uniquement)' })
+  @ApiResponse({ status: 200, description: 'Liste des utilisateurs retournée avec succès.' })
   async findAll() {
     return this.userRepo.findAll();
   }
@@ -58,14 +65,13 @@ export class UserController {
     return this.userRepo.deleteUser(id);
   }
 
-  @Roles('user')
+  @Roles('user', 'etudiant', 'surveillant', 'comptabilite', 'admin')
   @Get('me')
   @ApiOperation({ summary: 'Récupérer le profil de l’utilisateur connecté' })
   @ApiResponse({ status: 200, description: 'Profil utilisateur retourné avec succès.' })
   @ApiResponse({ status: 404, description: 'Utilisateur introuvable.' })
   async getProfile(@Req() req: Request) {
     const email = (req.user as { email: string }).email;
-    console.log('🔍 Email extrait du token:', email);
 
     const user = await this.userRepo.findByEmail(email);
     if (!user) {
