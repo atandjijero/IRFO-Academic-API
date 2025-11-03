@@ -46,19 +46,19 @@ export class CreateUserDto {
 
   @ApiProperty({
     description: 'Rôle de l’utilisateur',
-    example: 'etudiant',
-    enum: ['admin', 'etudiant', 'surveillant', 'comptabilite'],
-    default: 'etudiant',
+    example: 'student',
+    enum: ['admin', 'student', 'supervisor', 'accountant'],
+    default: 'student',
   })
-  @IsIn(['admin', 'etudiant', 'surveillant', 'comptabilite'])
-  role: 'admin' | 'etudiant' | 'surveillant' | 'comptabilite';
+  @IsIn(['admin', 'student', 'supervisor', 'accountant'])
+  role: 'admin' | 'student' | 'supervisor' | 'accountant';
 
   @ApiProperty({
     description: 'Statut du compte utilisateur',
-    example: 'actif',
-    enum: ['actif', 'inactif', 'bloque'],
-    default: 'actif',
+    example: 'active',
+    enum: ['active', 'inactive', 'blocked'],
+    default: 'active',
   })
-  @IsIn(['actif', 'inactif', 'bloque'])
-  status: 'actif' | 'inactif' | 'bloque';
+  @IsIn(['active', 'inactive', 'blocked'])
+  status: 'active' | 'inactive' | 'blocked';
 }

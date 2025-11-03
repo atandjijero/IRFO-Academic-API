@@ -34,7 +34,7 @@ export class AuthGuard implements CanActivate {
       const payload = this.jwtService.verify(token);
       request.user = payload;
 
-      // Vérification du statut de l'utilisateur
+      
       if (payload.status === 'bloque') {
         throw new ForbiddenException('Compte bloqué par l’administration');
       }
@@ -43,7 +43,7 @@ export class AuthGuard implements CanActivate {
         throw new ForbiddenException('Compte inactif, veuillez contacter le support');
       }
 
-      // Vérification du rôle si nécessaire
+      
       if (requiredRoles && !requiredRoles.includes(payload.role)) {
         throw new ForbiddenException('Accès interdit : Seul un admin est autorisé!');
       }

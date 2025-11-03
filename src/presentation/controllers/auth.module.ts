@@ -12,18 +12,18 @@ import { JwtTokenService } from '../../infrastructure/jwt/jwt-token.service';
 import { MailerService } from '../../infrastructure/mailer/mailer.service';
 import { UserRepository } from '../../infrastructure/repositories/user.repository';
 
-// Schéma Mongoose
+
 import { User, UserSchema } from '../../infrastructure/database/user.schema';
 
-// Garde d’authentification
+
 import { AuthGuard } from '../guards/auth.guard';
 
 @Module({
   imports: [
-    // Chargement des variables d’environnement
+    
     ConfigModule,
 
-    // Configuration dynamique du module JWT
+    
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -33,7 +33,7 @@ import { AuthGuard } from '../guards/auth.guard';
       inject: [ConfigService],
     }),
 
-    // Enregistrement du schéma utilisateur dans Mongoose
+    
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
   ],
 
@@ -49,7 +49,7 @@ import { AuthGuard } from '../guards/auth.guard';
 
   exports: [
     JwtTokenService,
-    JwtModule, // Permet aux autres modules d’utiliser JwtService
+    JwtModule, 
   ],
 })
 export class AuthModule {}

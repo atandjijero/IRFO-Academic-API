@@ -8,6 +8,7 @@ import {
   UseGuards,
   Req,
   NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import type { Request } from 'express';
 import { UserRepository } from '../../infrastructure/repositories/user.repository';
@@ -21,6 +22,7 @@ import {
   ApiOperation,
   ApiResponse,
   ApiParam,
+  ApiBody,
 } from '@nestjs/swagger';
 
 @ApiTags('Users')
@@ -32,52 +34,89 @@ export class UserController {
 
   @Roles('admin')
   @Get()
-  @ApiOperation({ summary: 'Voir tous les utilisateurs (admin uniquement)' })
-  @ApiResponse({ status: 200, description: 'Liste des utilisateurs retournée avec succès.' })
+  @ApiOperation({ summary: 'View all users (admin only)' })
+  @ApiResponse({ status: 200, description: 'User list retrieved successfully.' })
   async findAll() {
     return this.userRepo.findAll();
   }
 
   @Roles('admin')
   @Put('approve/:id')
-  @ApiOperation({ summary: 'Valider ou approuver un utilisateur (admin uniquement)' })
-  @ApiParam({ name: 'id', description: "ID de l'utilisateur à approuver" })
-  @ApiResponse({ status: 200, description: 'Utilisateur approuvé avec succès.' })
+  @ApiOperation({ summary: 'Approve a user (admin only)' })
+  @ApiParam({ name: 'id', description: "ID of the user to approve" })
+  @ApiResponse({ status: 200, description: 'User approved successfully.' })
   async approve(@Param('id') id: string) {
     return this.userRepo.approveUser(id);
   }
 
   @Roles('admin')
   @Put(':id')
-  @ApiOperation({ summary: 'Mettre à jour un utilisateur (admin uniquement)' })
-  @ApiParam({ name: 'id', description: "ID de l'utilisateur à mettre à jour" })
-  @ApiResponse({ status: 200, description: 'Utilisateur mis à jour avec succès.' })
+  @ApiOperation({ summary: 'Update a user (admin only)' })
+  @ApiParam({ name: 'id', description: "ID of the user to update" })
+  @ApiResponse({ status: 200, description: 'User updated successfully.' })
   async update(@Param('id') id: string, @Body() data: UpdateUserDto) {
     return this.userRepo.updateUser(id, data);
   }
 
   @Roles('admin')
   @Delete(':id')
-  @ApiOperation({ summary: 'Supprimer un utilisateur (admin uniquement)' })
-  @ApiParam({ name: 'id', description: "ID de l'utilisateur à supprimer" })
-  @ApiResponse({ status: 200, description: 'Utilisateur supprimé avec succès.' })
+  @ApiOperation({ summary: 'Delete a user (admin only)' })
+  @ApiParam({ name: 'id', description: "ID of the user to delete" })
+  @ApiResponse({ status: 200, description: 'User deleted successfully.' })
   async delete(@Param('id') id: string) {
     return this.userRepo.deleteUser(id);
   }
 
-  @Roles('user', 'etudiant', 'surveillant', 'comptabilite', 'admin')
+  @Roles('user', 'student', 'supervisor', 'accountant', 'admin')
   @Get('me')
-  @ApiOperation({ summary: 'Récupérer le profil de l’utilisateur connecté' })
-  @ApiResponse({ status: 200, description: 'Profil utilisateur retourné avec succès.' })
-  @ApiResponse({ status: 404, description: 'Utilisateur introuvable.' })
+  @ApiOperation({ summary: 'Get the profile of the logged-in user' })
+  @ApiResponse({ status: 200, description: 'User profile retrieved successfully.' })
+  @ApiResponse({ status: 404, description: 'User not found.' })
   async getProfile(@Req() req: Request) {
     const email = (req.user as { email: string }).email;
-
     const user = await this.userRepo.findByEmail(email);
     if (!user) {
-      throw new NotFoundException(`Utilisateur avec l'email ${email} introuvable`);
+      throw new NotFoundException(`User with email ${email} not found`);
+    }
+    return user;
+  }
+
+  @Roles('admin')
+  @Put('status/:id')
+  @ApiOperation({ summary: 'Update user status (admin only)' })
+  @ApiParam({ name: 'id', description: "ID of the user to update" })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        status: {
+          type: 'string',
+          enum: ['active', 'inactive', 'blocked'],
+        },
+      },
+      required: ['status'],
+    },
+  })
+  @ApiResponse({ status: 200, description: 'User status updated successfully.' })
+  @ApiResponse({ status: 400, description: 'Invalid status value.' })
+  @ApiResponse({ status: 404, description: 'User not found.' })
+  async updateStatus(
+    @Param('id') id: string,
+    @Body('status') status: string
+  ) {
+    const allowedStatuses = ['active', 'inactive', 'blocked'];
+    if (!allowedStatuses.includes(status)) {
+      throw new BadRequestException(
+        "Invalid status. Please choose one of: 'active', 'inactive', 'blocked'."
+      );
     }
 
-    return user;
+    const user = await this.userRepo.findById(id);
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+
+    user.status = status as 'active' | 'inactive' | 'blocked';
+    return this.userRepo.save(user);
   }
 }

@@ -7,18 +7,15 @@ import { Model } from 'mongoose';
 export class UserRepository {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
-  // Création d’un nouvel utilisateur
   async createUser(data: Partial<User>) {
     const user = new this.userModel(data);
     return user.save();
   }
 
-  // Recherche par email
   async findByEmail(email: string) {
     return this.userModel.findOne({ email });
   }
 
-  // Vérification du code OTP
   async verifyOtp(email: string, otp: string) {
     const user = await this.findByEmail(email);
     if (!user) {
@@ -33,7 +30,6 @@ export class UserRepository {
     return user.save();
   }
 
-  // Validation par l’admin
   async approveUser(id: string) {
     const user = await this.userModel.findByIdAndUpdate(
       id,
@@ -46,12 +42,10 @@ export class UserRepository {
     return user;
   }
 
-  // Liste de tous les utilisateurs
   async findAll() {
     return this.userModel.find();
   }
 
-  // Mise à jour d’un utilisateur
   async updateUser(id: string, data: Partial<User>) {
     const user = await this.userModel.findByIdAndUpdate(id, data, { new: true });
     if (!user) {
@@ -60,12 +54,23 @@ export class UserRepository {
     return user;
   }
 
-  // Suppression d’un utilisateur
   async deleteUser(id: string) {
     const user = await this.userModel.findByIdAndDelete(id);
     if (!user) {
       throw new NotFoundException('Utilisateur introuvable');
     }
     return user;
+  }
+
+  async findById(id: string): Promise<UserDocument> {
+    const user = await this.userModel.findById(id);
+    if (!user) {
+      throw new NotFoundException('Utilisateur introuvable');
+    }
+    return user;
+  }
+
+  async save(user: UserDocument): Promise<UserDocument> {
+    return user.save();
   }
 }

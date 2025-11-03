@@ -12,14 +12,19 @@ export class RegisterUserUseCase {
   ) {}
 
   async execute(dto: CreateUserDto) {
+    // Validate password confirmation
     if (dto.password !== dto.confirmPassword) {
-      throw new BadRequestException('Les mots de passe ne correspondent pas');
+      throw new BadRequestException('Passwords do not match');
     }
 
+    // Hash the password
     const hashedPassword = await bcrypt.hash(dto.password, 10);
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const otpExpiresAt = new Date(Date.now() + 5 * 60 * 1000);
 
+    // Generate OTP and expiration
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otpExpiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes from now
+
+    // Create the user
     const user = await this.userRepo.createUser({
       ...dto,
       password: hashedPassword,
@@ -27,14 +32,15 @@ export class RegisterUserUseCase {
       otpExpiresAt,
       isEmailVerified: false,
       isApprovedByAdmin: false,
-      role: dto.role ?? 'etudiant', // rôle par défaut si non fourni
-      status: dto.status ?? 'actif', // statut par défaut si non fourni
+      role: dto.role ?? 'student',
+      status: dto.status ?? 'active',
     });
 
+    // Send OTP email
     try {
       await this.mailerService.sendOtpEmail(dto.email, otp);
     } catch (error) {
-      throw new InternalServerErrorException('Utilisateur créé, mais échec de l’envoi de l’OTP');
+      throw new InternalServerErrorException('User created, but failed to send OTP');
     }
 
     return user;

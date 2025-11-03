@@ -14,7 +14,7 @@ export interface UserPayload {
 export class JwtTokenService {
   constructor(private readonly jwt: JwtService) {}
 
-  // ✅ Génère un token JWT pour l'authentification
+  
   generateToken(payload: UserPayload): string {
     return this.jwt.sign({
       id: payload.id,
@@ -24,12 +24,11 @@ export class JwtTokenService {
     });
   }
 
-  // ✅ Génère un token dédié à la vérification d'email
+  
   generateEmailVerificationToken(userId: string, email: string): string {
     return this.jwt.sign({ sub: userId, email });
   }
 
-  // ✅ Vérifie et décode un token d'authentification
   verifyAuthToken(token: string): UserPayload {
     try {
       return this.jwt.verify<UserPayload>(token);
@@ -38,7 +37,6 @@ export class JwtTokenService {
     }
   }
 
-  // ✅ Vérifie et décode un token de vérification d’email
   verifyEmailToken(token: string): { sub: string; email: string } {
     try {
       return this.jwt.verify<{ sub: string; email: string }>(token);

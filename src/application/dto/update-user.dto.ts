@@ -1,38 +1,22 @@
-import { IsOptional, IsIn, IsString, IsEmail } from 'class-validator';
+import { IsOptional, IsIn } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class UpdateUserDto {
   @ApiPropertyOptional({
-    description: "Prénom de l'utilisateur",
-    example: 'Jerome',
+    description: 'Rôle mis à jour',
+    enum: ['admin', 'student', 'supervisor', 'accountant'],
   })
   @IsOptional()
-  @IsString()
-  firstName?: string;
+  @IsIn(['admin', 'student', 'supervisor', 'accountant'])
+  role?: 'admin' | 'student' | 'supervisor' | 'accountant';
 
   @ApiPropertyOptional({
-    description: "Nom de famille de l'utilisateur",
-    example: 'Kouassi',
+    description: 'Statut mis à jour',
+    enum: ['active', 'inactive', 'blocked'],
   })
   @IsOptional()
-  @IsString()
-  lastName?: string;
+  @IsIn(['active', 'inactive', 'blocked'])
+  status?: 'active' | 'inactive' | 'blocked';
 
-  @ApiPropertyOptional({
-    description: "Rôle de l'utilisateur",
-    enum: ['admin', 'etudiant', 'surveillant', 'comptabilite'],
-    example: 'etudiant',
-  })
-  @IsOptional()
-  @IsIn(['admin', 'etudiant', 'surveillant', 'comptabilite'])
-  role?: 'admin' | 'etudiant' | 'surveillant' | 'comptabilite';
-
-  @ApiPropertyOptional({
-    description: "Statut du compte utilisateur",
-    enum: ['actif', 'inactif', 'bloque'],
-    example: 'actif',
-  })
-  @IsOptional()
-  @IsIn(['actif', 'inactif', 'bloque'])
-  status?: 'actif' | 'inactif' | 'bloque';
+  // autres propriétés optionnelles...
 }

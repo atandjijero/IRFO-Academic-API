@@ -73,11 +73,11 @@ async login(@Body() body: LoginDto) {
     throw new BadRequestException('Compte non approuvé par l’admin');
   }
 
-  if (user.status === 'bloque') {
+  if (user.status === 'blocked') {
     throw new BadRequestException('Compte bloqué par l’administration');
   }
 
-  if (user.status === 'inactif') {
+  if (user.status === 'inactive') {
     throw new BadRequestException('Compte inactif. Veuillez contacter l’administration.');
   }
 
