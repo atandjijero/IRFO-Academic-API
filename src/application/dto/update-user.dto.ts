@@ -18,5 +18,4 @@ export class UpdateUserDto {
   @IsIn(['active', 'inactive', 'blocked'])
   status?: 'active' | 'inactive' | 'blocked';
 
-  // autres propriétés optionnelles...
 }

@@ -14,6 +14,8 @@ import { UpdateNoteDto } from 'src/application/dto/update-note.dto';
 import { AuthGuard } from 'src/presentation/guards/auth.guard';
 import { RolesGuard } from 'src/presentation/guards/roles.guard';
 import { Roles } from 'src/presentation/decorators/roles.decorator';
+import { CurrentUser } from 'src/presentation/decorators/current-user.decorator';
+import type { UserDocument } from 'src/infrastructure/database/user.schema';
 import {
   ApiTags,
   ApiBearerAuth,
@@ -35,6 +37,8 @@ export class NoteController {
   @ApiOperation({ summary: 'Create a new note' })
   @ApiBody({ type: CreateNoteDto })
   @ApiResponse({ status: 201, description: 'Note created successfully.' })
+  @ApiResponse({ status: 400, description: 'Invalid input or user is not a student.' })
+  @ApiResponse({ status: 500, description: 'Internal server error.' })
   create(@Body() data: CreateNoteDto) {
     return this.service.create(data);
   }
@@ -43,15 +47,16 @@ export class NoteController {
   @Get()
   @ApiOperation({ summary: 'Get all notes' })
   @ApiResponse({ status: 200, description: 'List of notes retrieved successfully.' })
-  findAll() {
-    return this.service.findAll();
+  findAll(@CurrentUser() user: UserDocument) {
+    return this.service.findAll(user);
   }
 
-  @Roles('admin','student')
+  @Roles('admin', 'student')
   @Get(':id')
   @ApiOperation({ summary: 'Get a specific note by ID' })
   @ApiParam({ name: 'id', description: 'ID of the note to retrieve' })
   @ApiResponse({ status: 200, description: 'Note retrieved successfully.' })
+  @ApiResponse({ status: 404, description: 'Note not found.' })
   findOne(@Param('id') id: string) {
     return this.service.findById(id);
   }
@@ -62,6 +67,8 @@ export class NoteController {
   @ApiParam({ name: 'id', description: 'ID of the note to update' })
   @ApiBody({ type: UpdateNoteDto })
   @ApiResponse({ status: 200, description: 'Note updated successfully.' })
+  @ApiResponse({ status: 400, description: 'Invalid input or user is not a student.' })
+  @ApiResponse({ status: 404, description: 'Note not found.' })
   update(@Param('id') id: string, @Body() data: UpdateNoteDto) {
     return this.service.update(id, data);
   }
@@ -71,6 +78,7 @@ export class NoteController {
   @ApiOperation({ summary: 'Delete a note' })
   @ApiParam({ name: 'id', description: 'ID of the note to delete' })
   @ApiResponse({ status: 200, description: 'Note deleted successfully.' })
+  @ApiResponse({ status: 404, description: 'Note not found.' })
   delete(@Param('id') id: string) {
     return this.service.delete(id);
   }

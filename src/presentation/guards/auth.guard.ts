@@ -20,7 +20,6 @@ export class AuthGuard implements CanActivate {
     if (isPublic) return true;
 
     const requiredRoles = this.reflector.get<string[]>('roles', context.getHandler());
-
     const request = context.switchToHttp().getRequest();
     const authHeader = request.headers.authorization;
 
@@ -34,23 +33,21 @@ export class AuthGuard implements CanActivate {
       const payload = this.jwtService.verify(token);
       request.user = payload;
 
-      
-      if (payload.status === 'bloque') {
+      if (payload.status === 'blocked') {
         throw new ForbiddenException('Compte bloqué par l’administration');
       }
 
-      if (payload.status === 'inactif') {
+      if (payload.status === 'inactive') {
         throw new ForbiddenException('Compte inactif, veuillez contacter le support');
       }
 
-      
       if (requiredRoles && !requiredRoles.includes(payload.role)) {
-        throw new ForbiddenException('Accès interdit : Seul un admin est autorisé!');
+        throw new ForbiddenException("Accès interdit : vous n'êtes autorisé à éffectuer cette actions");
       }
 
       return true;
-    } catch (error) {
-      throw new UnauthorizedException('Seul un admin est autorisé à faire cette action ou Token invalide ou expiré!');
+    } catch {
+      throw new UnauthorizedException('Token invalide ou expiré');
     }
   }
 }

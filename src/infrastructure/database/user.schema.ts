@@ -16,7 +16,7 @@ export class User {
   password: string;
 
   @Prop()
-  address: string;
+  address?: string;
 
   @Prop({ default: 'student', enum: ['admin', 'student', 'supervisor', 'accountant'] })
   role: 'admin' | 'student' | 'supervisor' | 'accountant';
@@ -31,10 +31,10 @@ export class User {
   isApprovedByAdmin: boolean;
 
   @Prop()
-  otpCode: string;
+  otpCode?: string; 
 
   @Prop()
-  otpExpiresAt: Date;
+  otpExpiresAt?: Date; 
 }
 
 export type UserDocument = User & Document & { _id: Types.ObjectId };

@@ -15,7 +15,7 @@ export class MailerService {
     }
 
     const port = Number(MAIL_PORT);
-    // SSL direct uniquement sur 465
+    
     const isSecure = port === 465; 
 
     this.transporter = nodemailer.createTransport({
@@ -27,7 +27,7 @@ export class MailerService {
         pass: MAIL_PASS,
       },
       tls: {
-        // Utile en environnement de test ou si certificat auto-signé
+        
         rejectUnauthorized: false,
       },
     });

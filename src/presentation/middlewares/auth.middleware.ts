@@ -18,7 +18,7 @@ export class AuthMiddleware implements NestMiddleware {
 
     try {
       const decoded = this.jwtService.verify(token) as UserPayload;
-      req.user = decoded; // injecte l'utilisateur typé dans la requête
+      req.user = decoded; 
       next();
     } catch (error) {
       return res.status(401).json({ message: 'Token invalide ou expiré' });

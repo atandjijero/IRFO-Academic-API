@@ -5,25 +5,25 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import * as dotenv from 'dotenv';
 
 async function bootstrap() {
-  
   dotenv.config();
 
   const app = await NestFactory.create(AppModule);
 
-  
-  app.enableCors();
+  app.enableCors({
+    origin: process.env.FRONTEND_URL || '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true,
+  });
 
-  
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true, 
-      forbidNonWhitelisted: true, 
-      transform: true, 
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
     })
   );
 
-
-  const swaggerConfig = new DocumentBuilder()
+  const config = new DocumentBuilder()
     .setTitle('IRFO Academic API / JEROME')
     .setDescription('Documentation des endpoints de l’API IRFO')
     .setVersion('1.0')
@@ -38,17 +38,16 @@ async function bootstrap() {
     )
     .build();
 
-  const document = SwaggerModule.createDocument(app, swaggerConfig);
+  const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document, {
     swaggerOptions: {
-      persistAuthorization: true, 
+      persistAuthorization: true,
     },
   });
 
-
   const port = process.env.PORT || 9000;
   await app.listen(port);
-  console.log(` Application lancée sur http://localhost:${port}/api`);
+  console.log(`Backend lancé sur http://localhost:${port}/api`);
 }
 
 bootstrap();

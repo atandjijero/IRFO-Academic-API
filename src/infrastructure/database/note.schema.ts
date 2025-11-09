@@ -14,11 +14,12 @@ export class Note {
   @Prop({ type: Types.ObjectId, ref: 'AcademicYear', required: true })
   academicYear: Types.ObjectId;
 
-  @Prop({ required: true })
-  studentName: string;
+  @Prop({ type: Types.ObjectId, ref: 'User', required: true })
+  student: Types.ObjectId;
 
+  // score devient une chaîne chiffrée
   @Prop({ required: true })
-  score: number;
+  score: string;
 }
 
 export const NoteSchema = SchemaFactory.createForClass(Note);
