@@ -24,18 +24,25 @@ export class User {
   @Prop({ default: 'active', enum: ['active', 'inactive', 'blocked'] })
   status: 'active' | 'inactive' | 'blocked';
 
-  @Prop({ default: false })
+  @Prop({ default: true })
   isEmailVerified: boolean;
 
   @Prop({ default: false })
   isApprovedByAdmin: boolean;
 
   @Prop()
-  otpCode?: string; 
+  otpCode?: string;
 
   @Prop()
-  otpExpiresAt?: Date; 
+  otpExpiresAt?: Date;
+  @Prop({ default: false })
+hasLoggedInOnce: boolean;
+
+@Prop()
+resetCode?: string;ss
 }
 
-export type UserDocument = User & Document & { _id: Types.ObjectId };
+//Correction ici : on précise que _id est de type Types.ObjectId
+export type UserDocument = Document & User & { _id: Types.ObjectId };
+
 export const UserSchema = SchemaFactory.createForClass(User);

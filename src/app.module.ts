@@ -2,16 +2,14 @@ import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 
-// Modules métier
 import { AuthModule } from './presentation/controllers/auth.module';
 import { UserModule } from './presentation/controllers/user.module';
 import { SubjectModule } from './presentation/controllers/subject.module';
 import { SchoolModule } from './presentation/controllers/school.module';
 import { AcademicYearModule } from './presentation/controllers/academic-year.module';
 import { NoteModule } from './presentation/controllers/note.module';
-import { HistoryModule } from 'src/presentation/controllers/history.module'; 
-
-// Middleware et Interceptor
+import { HistoryModule } from 'src/presentation/controllers/history.module';
+import { CryptoModule } from 'src/crypto/crypto.module'; 
 import { ActionLoggerMiddleware } from 'src/presentation/middlewares/action-logger.middleware';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { HistoryInterceptor } from 'src/presentation/interceptors/history.interceptor';
@@ -34,11 +32,12 @@ import { HistoryInterceptor } from 'src/presentation/interceptors/history.interc
     SchoolModule,
     AcademicYearModule,
     NoteModule,
-    HistoryModule, 
+    HistoryModule,
+    CryptoModule, 
   ],
 
   providers: [
-    ActionLoggerMiddleware, // ✅ Ajouté pour injection de HistoryService
+    ActionLoggerMiddleware,
     {
       provide: APP_INTERCEPTOR,
       useClass: HistoryInterceptor,

@@ -15,8 +15,7 @@ export class MailerService {
     }
 
     const port = Number(MAIL_PORT);
-    
-    const isSecure = port === 465; 
+    const isSecure = port === 465;
 
     this.transporter = nodemailer.createTransport({
       host: MAIL_HOST,
@@ -27,7 +26,6 @@ export class MailerService {
         pass: MAIL_PASS,
       },
       tls: {
-        
         rejectUnauthorized: false,
       },
     });
@@ -45,29 +43,42 @@ export class MailerService {
     const subject = 'Code OTP de vérification';
     const text = `Votre code OTP est : ${otp}. Il est valable pendant 5 minutes.`;
     const html = `
-      <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
-        <div style="max-width: 600px; margin: auto; background-color: #ffffff; padding: 30px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
-          <h2 style="color: #007bff;">Bienvenue sur la plateforme <strong>IRFO-ACADEMIC</strong> !</h2>
-          <p>Voici votre code à usage unique pour valider votre adresse email :</p>
-          <div style="font-size: 32px; color: #28a745; font-weight: bold; margin: 20px 0;">${otp}</div>
-          <p>Ce code est valable pendant <strong>5 minutes</strong>.</p>
-          <p>Merci de votre confiance.</p>
-        </div>
-      </div>
+      <h2 style="color: #007bff;">Bienvenue sur la plateforme <strong>IRFO-ACADEMIC</strong> !</h2>
+      <p>Voici votre code à usage unique pour valider votre adresse email :</p>
+      <div style="font-size: 32px; color: #28a745; font-weight: bold; margin: 20px 0;">${otp}</div>
+      <p>Ce code est valable pendant <strong>5 minutes</strong>.</p>
+      <p>Merci de votre confiance.</p>
     `;
 
+    await this.sendEmail(recipient, subject, text, html);
+  }
+
+  async sendResetPasswordEmail(recipient: string, code: string): Promise<void> {
+    const subject = 'Réinitialisation de votre mot de passe';
+    const text = `Voici votre code de réinitialisation : ${code}. Il est valable pendant 10 minutes.`;
+    const html = `
+      <h2 style="color: #dc3545;">Demande de réinitialisation de mot de passe</h2>
+      <p>Voici votre code :</p>
+      <div style="font-size: 32px; color: #dc3545; font-weight: bold;">${code}</div>
+      <p>Valable pendant <strong>10 minutes</strong>.</p>
+    `;
+
+    await this.sendEmail(recipient, subject, text, html);
+  }
+
+  private async sendEmail(to: string, subject: string, text: string, html: string): Promise<void> {
     try {
       const info = await this.transporter.sendMail({
         from: `"IRFO-ACADEMIC" <${process.env.MAIL_USER}>`,
-        to: recipient,
+        to,
         subject,
         text,
         html,
       });
-      this.logger.log(`Email OTP envoyé à ${recipient} | ID: ${info.messageId}`);
+      this.logger.log(`Email envoyé à ${to} | ID: ${info.messageId}`);
     } catch (error) {
-      this.logger.error(`Échec de l’envoi de l’email à ${recipient}`, error);
+      this.logger.error(`Échec de l’envoi de l’email à ${to}`, error);
       throw new InternalServerErrorException('Échec de l’envoi de l’email');
-    }
+       }
   }
 }
