@@ -99,7 +99,7 @@ export class AuthController {
     return { token };
   }
 
-  @Post('for-password')
+  @Post('forgot-password')
   @ApiOperation({ summary: 'Demande de code de réinitialisation' })
   @ApiBody({ type: ForgotPasswordDto })
   async requestResetPassword(@Body() dto: ForgotPasswordDto) {
